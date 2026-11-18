@@ -40,5 +40,155 @@ from ..model_cache import get_preds  # noqa: F401
 
 
 def run(ds, cfg, preds=None):
-    # TODO
-    raise NotImplementedError("check second_opinion chưa làm")
+    settings = cfg["second_opinion"]
+    conf_threshold = settings["conf"]
+    min_area_px = settings["min_area_px"]
+    fp_conf = settings["fp_conf"]
+    iou_missing = settings["iou_missing"]
+    iou_match = settings["iou_match"]
+    iou_loose = settings["iou_loose"]
+
+    if preds is None:
+        preds = get_preds(ds, cfg, "checker")
+
+    issues = []
+
+    # image_files() được sắp xếp theo tên, giúp kết quả luôn deterministic.
+    for image_path in ds.image_files():
+        stem = image_path.stem
+
+        if stem not in preds:
+            continue
+
+        label_lines = ds.read_label_lines(stem)
+        if label_lines is None:
+            continue
+
+        image_size = ds.image_size(stem)
+        if image_size is None:
+            continue
+
+        image_width, image_height = image_size
+        labels = ds.valid_boxes(stem)
+        image_predictions = preds[stem]
+
+        # Lượt 1: model nhìn thấy vật nhưng nhãn có thể thiếu, sai lớp
+        # hoặc có box quá lỏng. Lượt này lọc cả confidence lẫn diện tích.
+        filtered_predictions = []
+        for prediction in image_predictions:
+            class_id, confidence, cx, cy, width, height = prediction
+            area_px = width * image_width * height * image_height
+
+            if confidence >= conf_threshold and area_px >= min_area_px:
+                filtered_predictions.append(prediction)
+
+        for prediction in filtered_predictions:
+            pred_class, confidence, cx, cy, width, height = prediction
+            pred_box = (cx, cy, width, height)
+
+            candidates = []
+            for label in labels:
+                label_class, lx, ly, lw, lh = label
+                overlap = iou_xywh(pred_box, (lx, ly, lw, lh))
+                if overlap >= iou_missing:
+                    candidates.append((label_class, overlap))
+
+            if not candidates:
+                issues.append(
+                    Issue(
+                        check="second_opinion",
+                        severity=WARN,
+                        code="POSSIBLE_MISSING",
+                        image=stem,
+                        message="Model thấy vật nhưng không có box nhãn tương ứng",
+                        extra={"conf": confidence},
+                    )
+                )
+                continue
+
+            same_class_ious = [
+                overlap
+                for label_class, overlap in candidates
+                if label_class == pred_class
+            ]
+
+            if same_class_ious:
+                best_same_class_iou = max(same_class_ious)
+                if best_same_class_iou < iou_loose:
+                    issues.append(
+                        Issue(
+                            check="second_opinion",
+                            severity=WARN,
+                            code="POSSIBLE_LOOSE_BOX",
+                            image=stem,
+                            message="Nhãn đúng lớp nhưng box có thể bị lỏng hoặc lệch",
+                            extra={
+                                "conf": confidence,
+                                "iou": best_same_class_iou,
+                            },
+                        )
+                    )
+                continue
+
+            best_other_class_iou = max(overlap for _, overlap in candidates)
+            if best_other_class_iou >= iou_match:
+                issues.append(
+                    Issue(
+                        check="second_opinion",
+                        severity=WARN,
+                        code="POSSIBLE_WRONG_CLASS",
+                        image=stem,
+                        message="Model và nhãn có thể không thống nhất về lớp",
+                        extra={
+                            "conf": confidence,
+                            "iou": best_other_class_iou,
+                        },
+                    )
+                )
+
+        # Lượt 2: mỗi label phải khớp ít nhất một prediction đủ fp_conf.
+        # Không lọc diện tích ở lượt này: prediction nhỏ vẫn có thể xác nhận
+        # rằng một box nhãn không phải false positive.
+        fp_predictions = []
+        for prediction in image_predictions:
+            _, confidence, cx, cy, width, height = prediction
+            if confidence >= fp_conf:
+                fp_predictions.append((cx, cy, width, height))
+
+        valid_labels_with_lines = []
+        for line_number, text in label_lines:
+            try:
+                label = parse_yolo_line(text)
+            except ValueError:
+                continue
+
+            class_id, cx, cy, width, height = label
+            if not 0 <= class_id < len(ds.classes):
+                continue
+            if width <= 0 or height <= 0:
+                continue
+
+            valid_labels_with_lines.append(
+                (line_number, (cx, cy, width, height))
+            )
+
+        for line_number, label_box in valid_labels_with_lines:
+            best_iou = max(
+                (iou_xywh(label_box, pred_box) for pred_box in fp_predictions),
+                default=0.0,
+            )
+
+            if best_iou < iou_missing:
+                issues.append(
+                    Issue(
+                        check="second_opinion",
+                        severity=WARN,
+                        code="POSSIBLE_FALSE_POS",
+                        image=stem,
+                        line=line_number,
+                        message="Box nhãn không khớp với prediction nào của model",
+                        extra={"iou": best_iou},
+                    )
+                )
+
+    return issues
