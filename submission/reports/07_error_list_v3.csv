@@ -1,0 +1,28 @@
+check,severity,code,image,line,message,extra
+missing_labels,warn,EMPTY_LABEL,img_0097,,file nhãn rỗng: ảnh nền hay thiếu nhãn?,
+missing_labels,warn,EMPTY_LABEL,img_0129,,file nhãn rỗng: ảnh nền hay thiếu nhãn?,
+missing_labels,warn,EMPTY_LABEL,img_0147,,file nhãn rỗng: ảnh nền hay thiếu nhãn?,
+missing_labels,warn,EMPTY_LABEL,img_0184,,file nhãn rỗng: ảnh nền hay thiếu nhãn?,
+missing_labels,warn,EMPTY_LABEL,img_0192,,file nhãn rỗng: ảnh nền hay thiếu nhãn?,
+label_format,warn,BOX_HUGE,img_0018,1,Box chiếm diện tích quá lớn,
+label_format,warn,BOX_TINY,img_0026,6,Cạnh ngắn của box chỉ có 11.41px,
+label_format,warn,BOX_TINY,img_0051,5,Cạnh ngắn của box chỉ có 8.91px,
+label_format,warn,BOX_HUGE,img_0128,1,Box chiếm diện tích quá lớn,
+label_format,warn,BOX_TINY,img_0161,2,Cạnh ngắn của box chỉ có 10.26px,
+label_format,warn,BOX_TINY,img_0161,3,Cạnh ngắn của box chỉ có 11.40px,
+label_format,warn,BOX_TINY,img_0161,4,Cạnh ngắn của box chỉ có 11.87px,
+label_format,warn,BOX_TINY,img_0183,11,Cạnh ngắn của box chỉ có 11.78px,
+label_format,warn,BOX_HUGE,img_0196,1,Box chiếm diện tích quá lớn,
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0014,2,Box nhãn không khớp với prediction nào của model,"{""iou"": 0.1450117456567434}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0022,2,Box nhãn không khớp với prediction nào của model,"{""iou"": 0.0}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0068,8,Box nhãn không khớp với prediction nào của model,"{""iou"": 0.19889536171485311}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0075,6,Box nhãn không khớp với prediction nào của model,"{""iou"": 0.10672083058763539}"
+second_opinion,warn,POSSIBLE_WRONG_CLASS,img_0078,,Model và nhãn có thể không thống nhất về lớp,"{""conf"": 0.8287, ""iou"": 0.9189310218686991}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0091,10,Box nhãn không khớp với prediction nào của model,"{""iou"": 0.12359206869958318}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0124,8,Box nhãn không khớp với prediction nào của model,"{""iou"": 0.03620175556397309}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0131,11,Box nhãn không khớp với prediction nào của model,"{""iou"": 0.0}"
+second_opinion,warn,POSSIBLE_MISSING,img_0183,,Model thấy vật nhưng không có box nhãn tương ứng,"{""conf"": 0.8104}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0189,4,Box nhãn không khớp với prediction nào của model,"{""iou"": 0.00916243131024922}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0191,1,Box nhãn không khớp với prediction nào của model,"{""iou"": 0.25644187130435536}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0206,1,Box nhãn không khớp với prediction nào của model,"{""iou"": 0.10827808564215993}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0212,4,Box nhãn không khớp với prediction nào của model,"{""iou"": 0.15014265209152355}"
