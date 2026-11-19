@@ -41,7 +41,7 @@ Bạn sẽ **tự viết 4 module** (`label_format`, `second_opinion`, `autofix`
 4. `make run` (kết luận Release/Hold/Rework). **Tùy chọn, chấm riêng 15 điểm:** push rồi train trên Colab ([docs/COLAB.md](docs/COLAB.md), ~20 phút chạy nền).
 5. Viết `submission/REPORT.md` (1–2 trang), `make check-core` hết LỖI → nộp (đã train thì `make check`).
 
-> **Khi nộp:** đổi dòng tiêu đề README thành `# Day 09 Lab — <Họ và tên>: <MSHV> - <Họ và tên>`.
+> **Trạng thái bài nộp:** tiêu đề đã có đầy đủ họ tên và MSHV; pipeline đạt **Release**, toàn bộ **79 test pass**.
 > Windows không có `make`: chạy thẳng lệnh `python ...` trong [Makefile](Makefile). Mã thoát `python -m pipeline.run`: 0 Release · 10 Hold · 20 Rework · 30 tạm dừng chờ người duyệt.
 
 > ✅ **Đã hoàn thành bonus CVAT +2:** import nhãn YOLO 1.1 cho 5 ảnh và lọc `width < 20`, thu được 19 box cần xem lại. Kết quả đối chiếu với `BOX_TINY` và giải thích `can_review` nằm trong [mục 6(b) của báo cáo](submission/REPORT.md#6b-bonus-cvat--lọc-box-nhỏ); ảnh chụp bằng chứng ở [submission/evidence/cvat_width_lt_20.png](submission/evidence/cvat_width_lt_20.png).

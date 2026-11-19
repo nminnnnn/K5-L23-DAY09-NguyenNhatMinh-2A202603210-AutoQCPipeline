@@ -1,24 +1,42 @@
-# Nộp bài
+# Nộp bài — Nguyễn Nhật Minh, 2A202603210
 
-## Repo
-Một người **một repo public**. Tên repo: `K5-L23-DAY09-<MSHV>-AutoQCPipeline` (không dấu, nối bằng `-`). Theo hướng dẫn lớp nếu giảng viên đặt quy ước khác.
+## Repository
 
-## Trước khi nộp
-1. Đổi dòng tiêu đề `# Day 09 Lab ...` của `README.md`: `# Day 09 Lab — <Họ và tên>: <MSHV> - <Họ và tên>`.
-2. Điền `submission/REPORT.md` (xoá mọi dòng `TODO(học viên)`).
-3. `make check-core` (phần lõi) hoặc `make check` (nếu đã train; tức `python scripts/check_submission.py [--no-train]`) hết **LỖI**.
-4. Nộp link repo lên LMS **https://aithucchien.vinuni.edu.vn** hoặc kênh giảng viên chỉ định.
+- Repository: [nminnnnn/K5-L23-DAY09-NguyenNhatMinh-2A202603210-AutoQCPipeline](https://github.com/nminnnnn/K5-L23-DAY09-NguyenNhatMinh-2A202603210-AutoQCPipeline)
+- Nhánh nộp bài: `main`
+- Tiêu đề `README.md` đã có đầy đủ họ tên và MSHV.
 
-## Cấu trúc bắt buộc
-```text
-README.md                         # dòng tiêu đề có MSHV - Họ và tên
-configs/pipeline.yaml             # ĐÃ calibrate (khác giá trị khởi đầu)
-pipeline/ …                       # code của bạn; pytest xanh
-submission/
-├── REPORT.md                     # báo cáo duy nhất (6 mục)
-├── calibration/                  # calibration_report.md|json (sinh bởi `make calibrate`)
-├── reports/                      # 01_intake … 08_summary.json, class_stats.csv  (sinh bởi `make run`)
-├── export/clean_v1/              # labels/, data.yaml, manifest.json
-└── results/                      # (tùy chọn, chấm riêng) raw_seed*.json, clean_seed*.json, comparison.md|json|png
+## Trạng thái hoàn thành
+
+- [x] Hoàn thành bốn module `label_format`, `second_opinion`, `autofix` và `gate`.
+- [x] Toàn bộ **79 unit test và test e2e đều pass**.
+- [x] Calibrate hai ngưỡng: `duplicates.phash_dist=16` và `second_opinion.conf=0.8`.
+- [x] Chạy pipeline end-to-end và sinh đầy đủ báo cáo, audit log, review queue cùng dataset export.
+- [x] Kết luận cuối: **Release** — 0 lỗi bắt buộc; 13/193 ảnh còn cảnh báo (6,74%), thấp hơn ngưỡng 10%.
+- [x] Chứng minh gate hoạt động với review budget bằng 0: **Rework**, exit code 20 và không export dataset.
+- [x] Hoàn thành bonus CVAT **+2** trên 5 ảnh: lọc `width < 20`, ghi nhận 19 box và đối chiếu với `BOX_TINY`.
+- [x] Không commit `work/` hoặc file trọng số `*.pt`.
+
+Phần train so sánh raw và clean là hạng mục tùy chọn, chấm riêng 15 điểm và không nằm trong phạm vi phiên bản nộp này. Trạng thái này được khai báo trung thực trong báo cáo.
+
+## Bằng chứng chính
+
+| Nội dung | Bằng chứng |
+|---|---|
+| Báo cáo cuối | [`submission/REPORT.md`](submission/REPORT.md) |
+| Calibration | [`submission/calibration/`](submission/calibration/) |
+| Báo cáo pipeline | [`submission/reports/`](submission/reports/) |
+| Dataset sạch và manifest | [`submission/export/clean_v1/`](submission/export/clean_v1/) |
+| Bonus CVAT +2 | [`submission/evidence/cvat_width_lt_20.png`](submission/evidence/cvat_width_lt_20.png) |
+
+## Kiểm tra trước khi nộp
+
+Trên Windows PowerShell, chạy:
+
+```powershell
+$env:PYTHONUTF8 = "1"
+python -m pytest -q
+python scripts\check_submission.py --no-train
 ```
-Không commit `work/`, `*.pt`.
+
+Link repository được nộp trên LMS theo kênh giảng viên quy định.
