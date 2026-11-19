@@ -65,3 +65,13 @@ Quyết định cuối là **Release** vì không còn lỗi bắt buộc và t�
 - **Prompt AI chính:** yêu cầu giải thích và triển khai bốn module `label_format`, `gate`, `autofix`, `second_opinion` theo docstring, dùng ngưỡng từ cấu hình và xử lý các ca biên trong unit test.
 - **Cách kiểm code AI:** chạy test riêng sau từng chức năng, sau đó chạy toàn bộ 79 test, kiểm tra audit log, calibration, pipeline e2e và trực quan hóa nhãn trên ảnh.
 - **Một lần AI sai:** AI ban đầu giả định terminal đang dùng đúng `.venv`, trong khi `python` thực tế trỏ tới môi trường cũ tại `D:\Vinuni\.venv`, dẫn đến `ModuleNotFoundError: PIL`. Tôi kiểm tra `sys.executable`, chuyển sang `.venv` trong repo và chạy lại test.
+
+### 6(b). Bonus CVAT — lọc box nhỏ
+
+Tôi import nhãn YOLO 1.1 của năm ảnh vào CVAT và áp dụng bộ lọc `width < 20`. CVAT tìm được tổng cộng **19 box**: `img_0026.jpg` có 6 box, `img_0030.jpg` có 4 box, `img_0051.jpg` có 3 box, `img_0069.jpg` có 2 box và `img_0161.jpg` có 4 box.
+
+Pipeline báo **6 `BOX_TINY` trên 4 ảnh**: một box ở `img_0026`, một box ở `img_0051`, một box ở `img_0069` và ba box ở `img_0161`; `img_0030` không có trong danh sách `BOX_TINY` ban đầu. CVAT tìm nhiều box hơn vì bộ lọc chỉ kiểm tra chiều rộng nhỏ hơn 20 px, trong khi pipeline dùng ngưỡng chặt hơn: cạnh ngắn nhất của box nhỏ hơn 12 px. Vì hai quy tắc không hoàn toàn giống nhau, CVAT phù hợp để mở rộng tập ứng viên cho người gán nhãn xem lại, chứ 19 box không đồng nghĩa với 19 lỗi chắc chắn.
+
+Thuộc tính `can_review=true` được người gán dùng để đánh dấu một box khó hoặc chưa chắc chắn, cần người thứ hai kiểm tra. Trong pipeline, thông tin tương tự được biểu diễn bằng issue mức `WARN` và đưa ảnh vào `05_review_queue.csv` để ưu tiên duyệt thủ công.
+
+Ảnh bằng chứng: [`evidence/cvat_width_lt_20.png`](evidence/cvat_width_lt_20.png).
